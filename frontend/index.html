@@ -3,141 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מסכם טקסטים</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <title>מערכת סיכום ראיונות</title>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --shadow-color: rgba(99, 102, 241, 0.1);
+            --border-radius: 16px;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #1e293b;
+        }
+
+        .candidates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .candidate-card {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 4px 6px var(--shadow-color);
+            transition: all 0.3s ease;
+        }
+
+        .candidate-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 12px var(--shadow-color);
+        }
+
+        .candidate-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .candidate-info {
+            padding: 20px;
+        }
+
+        .candidate-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1e293b;
+        }
+
+        .candidate-position {
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .candidate-details {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+
+        .button:hover {
+            background: #4f46e5;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5vh auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: var(--border-radius);
+            position: relative;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748b;
+            background: none;
+            border: none;
+            padding: 5px;
+        }
+
+        .interview-text {
+            white-space: pre-line;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .select {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            min-width: 200px;
+        }
+
+        .summary-result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .summary-result.visible {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            margin-right: 8px;
+        }
+
+        .loading.visible {
+            display: inline;
+        }
+        .hidden {
+    display: none;
+        }
+
+        .summary-preview {
+            margin-top: 16px;
+            padding: 12px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .summary-actions {
+            margin-top: 16px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .save-summary {
+            background: #10b981 !important;  /* ירוק */
+        }
+
+        .save-summary:hover {
+            background: #059669 !important;
+        }
+        @media (max-width: 768px) {
+            .candidates-grid {
+                grid-template-columns: 1fr;
+            }
+            .modal-content {
+                width: 95%;
+                margin: 2vh auto;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>מסכם טקסטים חכם</h1>
+            <h1>מועמדים לראיון</h1>
         </div>
+        <div class="candidates-grid" id="candidatesGrid"></div>
+    </div>
 
-        <div class="text-card">
-            <div class="text-content">
-                נוהל ראיון תעסוקתי בלשכת התעסוקה - מדריך למתייצב
-        
-                בהגיעך ללשכת התעסוקה, תתבקש להשתתף בראיון תעסוקתי מקיף עם יועץ תעסוקה מקצועי. מטרת הראיון היא למפות את כישוריך, ניסיונך התעסוקתי והעדפותיך המקצועיות, במטרה לסייע לך במציאת עבודה מתאימה.
-        
-                במהלך הראיון תתבקש להציג מסמכים רשמיים כגון תעודת זהות, קורות חיים מעודכנים, תעודות השכלה ואישורי העסקה קודמים. היועץ יתעד את כל המידע במערכת הממוחשבת של לשכת התעסוקה.
-        
-                היועץ ישאל שאלות מקיפות על השכלתך, כולל תארים אקדמיים, הכשרות מקצועיות וקורסים שעברת. תתבקש לפרט על ניסיונך התעסוקתי, כולל תפקידים קודמים, תחומי אחריות והישגים משמעותיים.
-        
-                חלק חשוב בראיון יוקדש להבנת העדפותיך התעסוקתיות: באיזה תחום היית רוצה לעבוד, מהן ציפיות השכר שלך, האם אתה מעוניין במשרה מלאה או חלקית, ומהי המרחק המקסימלי שאתה מוכן לנסוע למקום העבודה.
-        
-                היועץ יבחן גם חסמים אפשריים לתעסוקה, כמו מגבלות רפואיות, צורך בהתאמות מיוחדות במקום העבודה, או קשיים בשמירה על מסגרת עבודה קבועה. מידע זה חיוני כדי להתאים לך משרות מתאימות.
-        
-                בסיום הראיון, היועץ יציע לך תוכנית פעולה אישית, שעשויה לכלול הפניה למשרות רלוונטיות, הכוונה לקורסי הכשרה מקצועית, או סדנאות לשיפור מיומנויות חיפוש עבודה.
-        
-                חשוב להגיע לראיון מוכן עם כל המסמכים הנדרשים ולהקפיד על דיוק בפרטים שאתה מוסר. כמו כן, מומלץ לחשוב מראש על מטרותיך התעסוקתיות ולהיות כן לגבי ציפיותיך והעדפותיך.
-        
-                היועץ יקבע איתך מועד למעקב ובדיקת התקדמות בתהליך חיפוש העבודה. בפגישת המעקב תוכל לדווח על ראיונות עבודה שקיימת, משרות שהגשת אליהן מועמדות, ולקבל משוב והכוונה נוספת.
-        
-                חשוב לזכור כי שיתוף פעולה מלא עם היועץ והשתתפות פעילה בתוכנית שנקבעה הם תנאי הכרחי להמשך קבלת דמי אבטלה או הבטחת הכנסה, במידה ואתה זכאי להם.
-        
-                לשכת התעסוקה מציעה גם שירותים נוספים כמו סדנאות לכתיבת קורות חיים, הכנה לראיונות עבודה, והדרכה בשימוש במערכות חיפוש עבודה מקוונות. היועץ יכול להפנות אותך לשירותים אלה בהתאם לצרכיך.
-            </div>
-            <div class="card-controls">
-                <select class="summary-type">
+    <div id="interviewModal" class="modal">
+        <div class="modal-content">
+            <button class="close-button" onclick="closeModal()">&times;</button>
+            <h2 id="modalTitle" class="candidate-name"></h2>
+            <div id="interviewText" class="interview-text"></div>
+            <div class="controls">
+                <select id="summaryType" class="select">
                     <option value="short">סיכום רגיל</option>
                     <option value="bullets">נקודות עיקריות</option>
                     <option value="very_short">משפט אחד</option>
+                    <option value="focused">מיקוד בניסיון והמלצות</option>
                 </select>
-                <button class="summarize-btn">
-                    <span class="loading">⏳</span>
-                    סכם טקסט
+                <button class="button" onclick="summarizeInterview()">
+                    <span id="loadingIndicator" class="loading">⏳</span>
+                    סכם ראיון
                 </button>
             </div>
-            <div class="summary-result">
-                <!-- כאן יופיע הסיכום -->
+            <div id="summaryResult" class="summary-result"></div>
+            <div class="summary-actions">
+                <button class="button save-summary hidden" id="saveSummaryBtn" onclick="saveSummary()">
+                    שמור סיכום
+                </button>
             </div>
         </div>
-
-<div class="text-card">
-    <div class="text-content">
-        סיכום ראיון תעסוקתי - 15.12.2024
-        
-        המרואיין: ישראל ישראלי, ת.ז. 123456789
-        יועץ תעסוקתי: דוד לוי
-        מספר תיק: 2024-789
-
-        המרואיין הגיע לפגישת ייעוץ תעסוקתי ראשונה בלשכת התעסוקה. בן 35, נשוי + 2, מתגורר בחיפה. בעל תואר ראשון במנהל עסקים ממכללת עמק יזרעאל (סיים לפני 8 שנים). 
-
-        ניסיון תעסוקתי: עבד במשך 6 שנים כמנהל חשבונות בחברת "טכנולוגיות מתקדמות בע"מ". פוטר לפני חודשיים עקב צמצומים בחברה. לפני כן עבד שנתיים כפקיד חשבונות בחברת ייבוא קטנה.
-
-        במהלך עבודתו התמחה בתוכנות SAP ופריוריטי, והיה אחראי על ניהול התקציב של מחלקת הפיתוח. ניהל צוות של 3 עובדים והיה מעורב בפרויקטים של הטמעת מערכות ERP.
-
-        מחפש משרה בתחום הפיננסי/חשבונאות, מעדיף תפקיד ניהולי. מוכן להתפשר על השכר ההתחלתי אך מצפה להתקדמות. מעוניין לעבוד באזור חיפה והקריות, מוכן לנסיעה של עד שעה.
-
-        במהלך הראיון הביע נכונות להשתתף בקורס העשרה בתחום ניהול כספים בארגונים, וגילה עניין בהסבה לתחום ניתוח מערכות פיננסיות. שולט ברמה טובה באנגלית עסקית.
-
-        חסמים: מתקשה בעבודה במשמרות ערב בשל מחויבות משפחתית (ילד עם צרכים מיוחדים). מעדיף סביבת עבודה יציבה ומסודרת.
-
-        המלצות היועץ:
-        1. הפניה למשרות רלוונטיות בתחום ניהול הכספים באזור חיפה והקריות
-        2. רישום לסדנת LinkedIn לשיפור הפרופיל המקצועי
-        3. הפניה לקורס בניתוח מערכות פיננסיות במימון הלשכה
-        4. קביעת פגישת מעקב בעוד שבועיים
-
-        מטרות לטווח הקרוב: שליחת קורות חיים ל-5 משרות בשבוע, השתתפות בסדנת LinkedIn, התחלת קורס מקצועי.
-    </div>
-    <div class="card-controls">
-        <select class="summary-type">
-            <option value="short">סיכום רגיל</option>
-            <option value="bullets">נקודות עיקריות</option>
-            <option value="very_short">משפט אחד</option>
-            <option value="focused">מיקוד בניסיון והמלצות</option>
-        </select>
-        <button class="summarize-btn">
-            <span class="loading">⏳</span>
-            סכם טקסט
-        </button>
-    </div>
-    <div class="summary-result">
-        <!-- כאן יופיע הסיכום -->
-    </div>
-    </div>
-        
     </div>
 
-    <script>
-        document.querySelectorAll('.text-card').forEach(card => {
-            const btn = card.querySelector('.summarize-btn');
-            const summaryResult = card.querySelector('.summary-result');
-            const loading = card.querySelector('.loading');
-            const summaryType = card.querySelector('.summary-type');
-            const textContent = card.querySelector('.text-content').textContent;
-
-            btn.addEventListener('click', async () => {
-                try {
-                    loading.classList.add('visible');
-                    btn.disabled = true;
-
-                    const response = await fetch('http://localhost:8000/analyze', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            text: textContent,
-                            summary_type: summaryType.value
-                        }),
-                    });
-
-                    const data = await response.json();
-                    if (data.result) {
-                        summaryResult.textContent = data.result;
-                        summaryResult.classList.add('visible');
-                    }
-                } catch (err) {
-                    console.error('Error:', err);
-                    summaryResult.textContent = 'אירעה שגיאה בתהליך הסיכום';
-                    summaryResult.classList.add('visible');
-                } finally {
-                    loading.classList.remove('visible');
-                    btn.disabled = false;
-                }
-            });
-        });
-    </script>
+    <script src="js/candidates.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
