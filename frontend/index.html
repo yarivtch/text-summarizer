@@ -6,10 +6,13 @@
     <title>מערכת סיכום ראיונות</title>
     <style>
         :root {
-            --primary-color: #6366f1;
-            --shadow-color: rgba(99, 102, 241, 0.1);
-            --border-radius: 16px;
-        }
+        --primary-color: #2563eb;  /* כחול כהה יותר */
+        --primary-light: #3b82f6;  /* כחול בהיר יותר */
+        --accent-color: #fbbf24;   /* צהוב עדין */
+        --shadow-color: rgba(37, 99, 235, 0.1);
+        --border-radius: 16px;
+        --transition: all 0.3s ease;
+        }   
 
         body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -43,6 +46,8 @@
             overflow: hidden;
             box-shadow: 0 4px 6px var(--shadow-color);
             transition: all 0.3s ease;
+            border-left: 4px solid var(--accent-color);
+
         }
 
         .candidate-card:hover {
@@ -57,7 +62,9 @@
         }
 
         .candidate-info {
-            padding: 20px;
+            position: relative;
+            padding-bottom: 48px; 
+            padding-right: 10px;
         }
 
         .candidate-name {
@@ -174,15 +181,16 @@
             display: inline;
         }
         .hidden {
-    display: none;
+          display: none;
         }
 
         .summary-preview {
-            margin-top: 16px;
+            background: linear-gradient(to right, #f0f9ff, #e0f2fe);
+            border-right: 3px solid var(--primary-color);
+            margin: 12px 0;
             padding: 12px;
-            background: #f1f5f9;
-            border-radius: 8px;
             font-size: 0.9rem;
+            line-height: 1.5;
         }
 
         .summary-actions {
@@ -198,7 +206,34 @@
         .save-summary:hover {
             background: #059669 !important;
         }
-        @media (max-width: 768px) {
+        .read-interview-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: var(--transition);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+        }
+
+        .read-interview-btn:hover {
+            background: var(--shadow-color);
+            transform: scale(1.1);
+        }
+
+        .read-interview-icon {
+            width: 24px;
+            height: 24px;
+        }     
+           @media (max-width: 768px) {
             .candidates-grid {
                 grid-template-columns: 1fr;
             }
