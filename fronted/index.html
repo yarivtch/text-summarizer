@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מסכם טקסטים</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>מסכם טקסטים</h1>
+        <textarea id="inputText" placeholder="הכנס טקסט לסיכום..."></textarea>
+        
+        <div class="controls">
+            <select id="summaryType" class="summary-type">
+                <option value="short">סיכום רגיל (3 משפטים)</option>
+                <option value="bullets">נקודות עיקריות</option>
+                <option value="very_short">משפט אחד בלבד</option>
+                <option value="focused">מיקוד בזמני ותנאי ביטול</option>
+            </select>
+            
+            <div class="button-container">
+                <button id="summarizeBtn" class="summarize-btn">סכם טקסט</button>
+                <button id="clearBtn" class="clear-btn">נקה טקסט</button>
+            </div>
+        </div>
+
+        <div id="loading" class="loading"></div>
+        <div id="error" class="error"></div>
+        <div id="summary" class="summary">
+            <h3>סיכום:</h3>
+            <div id="summaryContent"></div>
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+</body>
+</html>
