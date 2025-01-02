@@ -50,34 +50,53 @@ async function summarizeInterview() {
     const summaryResult = document.getElementById('summaryResult');
     
     loadingIndicator.classList.add('visible');
+    let retries = 3;
     
-    try {
-        const response = await fetch('http://localhost:8000/analyze', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                text: text,
-                summary_type: summaryType
-            }),
-        });
+    while (retries > 0) {
+        try {
+            const response = await fetch('http://localhost:8000/analyze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: text,
+                    summary_type: summaryType
+                }),
+            });
 
-        const data = await response.json();
-        if (data.result) {
+            const data = await response.json();
+            if (data.error) {
+                console.error('Server returned error:', data.error);
+                if (retries > 1) {
+                    retries--;
+                    await new Promise(resolve => setTimeout(resolve, 1000)); // המתן שנייה
+                    continue;
+                }
+                throw new Error(data.error);
+            }
+            
             summaryResult.textContent = data.result;
             summaryResult.classList.add('visible');
             document.getElementById('saveSummaryBtn').classList.remove('hidden');
-
+            break;
+            
+        } catch (err) {
+            retries--;
+            if (retries === 0) {
+                console.error('Final error:', err);
+                summaryResult.textContent = 'אירעה שגיאה בתהליך הסיכום. אנא נסה שנית.';
+                summaryResult.classList.add('visible');
+            } else {
+                console.log(`Retrying... ${retries} attempts left`);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
         }
-    } catch (err) {
-        console.error('Error:', err);
-        summaryResult.textContent = 'אירעה שגיאה בתהליך הסיכום';
-        summaryResult.classList.add('visible');
-    } finally {
-        loadingIndicator.classList.remove('visible');
     }
+    
+    loadingIndicator.classList.remove('visible');
 }
+
 
 function saveSummary() {
     const summaryText = document.getElementById('summaryResult').textContent;
